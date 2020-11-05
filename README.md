@@ -15,16 +15,10 @@ $ yarn
 ### Development
 
 ```bash
-# Required: typescript watch compilation
-$ yarn watch
-
-# Required: development server with hot reload (nodemon)
-$ yarn local
-
 # Format with prettier
 $ yarn format
 
-# Required: run yarn watch & yarn local concurrently
+# Required: run development server with hot reload (nodemon)
 $ yarn dev
 ```
 
