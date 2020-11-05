@@ -1,12 +1,12 @@
 # Fastify & Typescript App
 
-> Fastify & TypeScript starter.
+> Fastify & TypeScript template.
 
 ## Installation
 
 ```bash
-$ git clone https://github.com/wahyufadz/fastify-typescript-starter.git
-$ cd fastify-typescript-starter
+$ git clone https://github.com/wahyufadz/fastify-typescript-template.git
+$ cd fastify-typescript-template
 $ yarn
 ```
 
