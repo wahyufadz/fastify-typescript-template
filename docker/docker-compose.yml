@@ -1,0 +1,55 @@
+nginx:
+  build: ./nginx/
+  container_name: nginx-container
+  ports:
+    - 80:80
+  links:
+    - php
+  volumes_from:
+    - app-data
+
+php:
+  build: ./php/
+  container_name: php-container
+  expose:
+    - 9000
+  links:
+    - mysql
+  volumes_from:
+    - app-data
+
+app-data:
+  image: php:7.0-fpm
+  container_name: app-data-container
+  volumes:
+    - ./:/var/www/html/
+  command: “true”
+
+mysql:
+  image: mariadb:latest
+  container_name: mysql-container
+  ports:
+    - 3306:3306
+  volumes_from:
+    - mysql-data
+  environment:
+    MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    MYSQL_ROOT_PASSWORD:
+    MYSQL_DATABASE: fastify-typescript-template
+
+mysql-data:
+  image: mariadb:latest
+  container_name: mysql-data-container
+  volumes:
+    - container-volume:/var/lib/mysql
+  command: "true"
+
+phpmyadmin:
+  image: phpmyadmin/phpmyadmin
+  container_name: phpmyadmin-container
+  ports:
+    - 8000:80
+  links:
+    - mysql
+  environment:
+    PMA_HOST: mysql
