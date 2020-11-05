@@ -1,35 +1,39 @@
 # Fastify & Typescript App
 
-> Fastify & TypeScript starter repository.
+> Fastify & TypeScript starter.
 
 ## Installation
 
 ```bash
-$ git clone https://github.com/Matschik/fastify-typescript-starter.git
+$ git clone https://github.com/wahyufadz/fastify-typescript-starter.git
 $ cd fastify-typescript-starter
-$ npm install
+$ yarn
 ```
 
 ## Usage
 
 ### Development
+
 ```bash
 # Required: typescript watch compilation
-$ npm run watch
+$ yarn watch
 
 # Required: development server with hot reload (nodemon)
-$ npm run dev
+$ yarn local
 
 # Format with prettier
-$ npm run format
+$ yarn format
+
+# Required: run yarn watch & yarn local concurrently
+$ yarn dev
 ```
 
 ### Production
 
 ```bash
 # build for production
-$ npm run build
+$ yarn build
 
 # start production app
-$ npm start
+$ yarn start
 ```
