@@ -1,7 +1,5 @@
-import dotenv from 'dotenv';
 import app from "./app";
 
-dotenv.config();
 const FASTIFY_PORT = Number(process.env.FASTIFY_PORT) || 3006;
 
 app.listen(FASTIFY_PORT);
