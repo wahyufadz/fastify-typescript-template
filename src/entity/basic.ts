@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
-import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity()
 export abstract class BasicEntity {
 
   @PrimaryGeneratedColumn()
