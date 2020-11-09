@@ -10,7 +10,18 @@ export class basicService {
     return await this.entityManager.findOne(this.model, data);
   }
 
-  create(_data: any) { }
+  async create(data: any) {
+    try {
+      const newModel = new this.model;
+      Object.keys(data).forEach(value => {
+        newModel[value] = data[value]
+      });
+      return await this.entityManager.save(newModel);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   update(_data: any) { }
   delete(_data: any) { }
 }

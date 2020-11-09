@@ -1,4 +1,4 @@
-import { compareSync } from "bcrypt";
+import { compareSync, hashSync } from "bcrypt";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import jwt from 'jsonwebtoken';
 import { userService } from '../service';
@@ -28,7 +28,22 @@ export default async function userController(fastify: FastifyInstance) {
     }
   });
 
-  // // POST /api/v1/auth/register
+  // POST /api/v1/auth/register
+  fastify.post("/register", async function (
+    request: FastifyRequest<{ Body: { username: string, email: string, firstName: string, lastName: string, password: string } }>,
+    reply: FastifyReply
+  ) {
+    const { username, email, firstName, lastName } = request.body
+    let { password } = request.body
+    password = hashSync(password, 10)
+    const user = await userRepo.create({ username, email, firstName, lastName, password });
+    reply.send({
+      statusCode: 201,
+      message: 'user created',
+      value: createToken(user)
+    })
+  });
+
   // // POST /api/v1/auth/refresh-token
   // // POST /api/v1/auth/logout
 
