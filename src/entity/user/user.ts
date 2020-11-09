@@ -10,9 +10,11 @@ export class User extends BasicEntity {
   @Column()
   lastName: string = '';
 
-  // ? username / email
   @Column({ unique: true })
-  identity: string;
+  username: string;
+
+  @Column({ unique: true })
+  email: string;
 
   @Column()
   password: string;
