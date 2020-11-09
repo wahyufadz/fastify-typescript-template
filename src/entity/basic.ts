@@ -14,12 +14,14 @@ export abstract class BasicEntity {
 
   @BeforeInsert()
   insert() {
-    this.createdAt = dayjs().toString();
-    this.updatedAt = dayjs().toString();
+    const now = dayjs().format();
+    this.createdAt = now;
+    this.updatedAt = now;
   }
 
   @BeforeUpdate()
   update() {
-    this.updatedAt = dayjs().toString();
+    const now = dayjs().format();
+    this.updatedAt = now;
   }
 }

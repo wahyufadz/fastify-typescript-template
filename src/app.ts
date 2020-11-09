@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import fastify from "fastify";
 import fastifyCORS from "fastify-cors";
 import fastifyFormBody from "fastify-formbody";
-import fastifyJWT from 'fastify-jwt';
+import fastifySensible from 'fastify-sensible';
 import fastifyTypeOrm from 'fastify-typeorm-plugin';
 import ormConfig from '../ormconfig.json';
 import router from "./router";
@@ -22,10 +22,8 @@ server.register(fastifyTypeOrm, ormConfig)
 // Plugin: fastify-formbody
 server.register(fastifyFormBody)
 
-// Plugin: fastify-jwt
-server.register(fastifyJWT, {
-  secret: process.env.FASTIFY_JWT || 'super secret'
-})
+// Plugin: fastify-sensible
+server.register(fastifySensible)
 
 // Middleware: Router
 server.register(router);

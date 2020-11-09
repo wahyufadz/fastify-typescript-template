@@ -1,17 +1,17 @@
-import { Column, Entity } from "typeorm";
+import { BeforeInsert, Column, Entity } from "typeorm";
 import { BasicEntity } from '../basic';
 
 @Entity()
 export class User extends BasicEntity {
 
   @Column()
-  firstName: string;
+  firstName: string = '';
 
   @Column()
-  lastName: string;
+  lastName: string = '';
 
   // ? username / email
-  @Column()
+  @Column({ unique: true })
   identity: string;
 
   @Column()
@@ -19,5 +19,10 @@ export class User extends BasicEntity {
 
   @Column()
   isActive: boolean;
+
+  @BeforeInsert()
+  insert() {
+    this.isActive = true;
+  }
 
 }
