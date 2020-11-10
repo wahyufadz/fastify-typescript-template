@@ -1,27 +1,33 @@
 import dayjs from 'dayjs';
 import { BeforeInsert, BeforeUpdate, Column, PrimaryGeneratedColumn } from "typeorm";
-
 export abstract class BasicEntity {
 
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('timestamp')
+  @Column({
+    type: 'timestamp',
+    default: () => 'null',
+    nullable: true,
+  })
   updatedAt: string;
 
-  @Column('timestamp')
+  @Column({
+    type: 'timestamp',
+    default: () => 'null',
+    nullable: true,
+  })
   createdAt: string;
 
   @BeforeInsert()
-  insert() {
-    const now = dayjs().format();
+  basicInsert() {
+    const now = dayjs().toISOString()
     this.createdAt = now;
     this.updatedAt = now;
   }
 
   @BeforeUpdate()
-  update() {
-    const now = dayjs().format();
-    this.updatedAt = now;
+  basicUpdate() {
+    this.updatedAt = dayjs().toISOString()
   }
 }

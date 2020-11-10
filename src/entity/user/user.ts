@@ -1,4 +1,5 @@
-import { BeforeInsert, Column, Entity } from "typeorm";
+import dayjs from 'dayjs';
+import { AfterLoad, BeforeInsert, Column, Entity } from "typeorm";
 import { BasicEntity } from '../basic';
 
 @Entity()
@@ -21,6 +22,12 @@ export class User extends BasicEntity {
 
   @Column()
   isActive: boolean;
+
+  @AfterLoad()
+  load() {
+    this.updatedAt = dayjs(this.updatedAt).format()
+    this.createdAt = dayjs(this.createdAt).format()
+  }
 
   @BeforeInsert()
   insert() {
