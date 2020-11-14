@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Fastify TypeScript starter repository",
   "scripts": {
-    "dev": "nodemon --watch './src/**/*.ts' --exec ts-node ./src/index.ts",
+    "dev": "nodemon --watch './src/**/*.ts' --exec ts-node ./src",
     "dev2": "ts-node-dev ./src/index.ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "build": "rm -rf dist && tsc",
