@@ -1,7 +1,8 @@
 import { compare, hash } from "bcrypt";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import jwt, { decode } from 'jsonwebtoken';
-import { RevokeTokenService, UserService } from '../service';
+import { RevokeTokenService, UserService } from '../../service';
+import { login } from './authSchema';
 
 export default async function userController(fastify: FastifyInstance) {
   const userService = new UserService()
@@ -15,17 +16,11 @@ export default async function userController(fastify: FastifyInstance) {
   }
 
   // POST /api/v1/auth/login
-  fastify.post("/login", async function (
+  fastify.post("/login", { schema: login }, async function (
     request: FastifyRequest<{ Body: { identity: string, password: string } }>,
     reply: FastifyReply,
   ) {
     const { identity, password } = request.body
-
-    // check required fields
-    if (!(identity && password)) {
-      reply.unprocessableEntity('username/email & password fields is required')
-      return
-    }
 
     let user: any = await userService.readOne({ where: [{ email: identity }, { username: identity }] })
 
@@ -43,7 +38,6 @@ export default async function userController(fastify: FastifyInstance) {
       reply.unauthorized('username/email & password doesn\'t match')
       return
     }
-
     reply.send({
       statusCode: 200,
       message: 'login success',

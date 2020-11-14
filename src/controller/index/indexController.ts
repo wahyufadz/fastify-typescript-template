@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { promises } from "fs";
 import { resolve } from "path";
 
@@ -10,7 +10,7 @@ export default async function indexController(fastify: FastifyInstance) {
     _request: FastifyRequest,
     reply: FastifyReply
   ) {
-    const indexHtmlPath = resolve(__dirname, "../../static/index.html");
+    const indexHtmlPath = resolve("./static/index.html");
     const indexHtmlContent = await readFile(indexHtmlPath);
     reply
       .header("Content-Type", "text/html; charset=utf-8")
