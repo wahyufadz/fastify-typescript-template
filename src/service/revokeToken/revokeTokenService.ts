@@ -1,4 +1,4 @@
-import { RevokeToken } from '../../entity/revoke-token/revokeToken';
+import { RevokeToken } from '../../entity';
 import { basicService } from '../basicService';
 
 export class RevokeTokenService extends basicService {

@@ -18,7 +18,14 @@ const server = fastify({
 server.register(fastifyCORS, {})
 
 // Plugin: fastify-typeorm-plugin
-server.register(fastifyTypeOrm, ormConfig)
+server.register(fastifyTypeOrm, {
+  ...ormConfig,
+
+  // fix directory structure bug in production mode
+  entities: [__dirname + '/entity/index.{js,ts}'],
+  migrations: [__dirname + '/migration/**/*.{js,ts}'],
+  subscribers: [__dirname + '/subscriber/**/*.{js,ts}'],
+})
 
 // Plugin: fastify-formbody
 server.register(fastifyFormBody)
