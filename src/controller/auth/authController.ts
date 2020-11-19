@@ -2,7 +2,7 @@ import { compare, hash } from "bcrypt";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import jwt, { decode } from 'jsonwebtoken';
 import { RevokeTokenService, UserService } from '../../service';
-import { login } from './authSchema';
+import { identity, login, logout, refresh, register } from './authSchema';
 
 export default async function userController(fastify: FastifyInstance) {
   const userService = new UserService()
@@ -46,18 +46,12 @@ export default async function userController(fastify: FastifyInstance) {
   });
 
   // POST /api/v1/auth/register
-  fastify.post("/register", async function (
+  fastify.post("/register", { schema: register }, async function (
     request: FastifyRequest<{ Body: { username: string, email: string, firstName: string, lastName: string, password: string } }>,
     reply: FastifyReply
   ) {
     const { username, email, firstName, lastName } = request.body
     let { password } = request.body
-
-    // check required fields
-    if (!(username && email && firstName && lastName)) {
-      reply.unprocessableEntity('username, email, firstName, lastName fields is required')
-      return
-    }
 
     // save data user to database
     password = await hash(password, 10)
@@ -70,17 +64,11 @@ export default async function userController(fastify: FastifyInstance) {
   });
 
   // POST /api/v1/auth/refresh
-  fastify.post("/refresh", async function (
+  fastify.post("/refresh", { schema: refresh }, async function (
     request: FastifyRequest<{ Body: { refreshToken: string } }>,
     reply: FastifyReply
   ) {
     const { refreshToken } = request.body
-
-    // check required fields
-    if (!refreshToken) {
-      reply.unprocessableEntity('refreshToken field is required')
-      return
-    }
 
     const decoded: any = decode(refreshToken)
 
@@ -92,7 +80,7 @@ export default async function userController(fastify: FastifyInstance) {
     }
 
     // check refresh token is revoked / logged out
-    const isLoggedOut = await revokeTokenService.readOne({ token: refreshToken }) === undefined
+    const isLoggedOut = await revokeTokenService.readOne({ token: refreshToken }) !== undefined
     if (isLoggedOut) {
       reply.unauthorized('refresh token was revoked please re-login')
       return
@@ -106,22 +94,25 @@ export default async function userController(fastify: FastifyInstance) {
   })
 
   // POST /api/v1/auth/logout
-  fastify.post("/logout", async function (
+  fastify.post("/logout", { schema: logout }, async function (
     request: FastifyRequest<{ Body: { refreshToken: string } }>,
     reply: FastifyReply
   ) {
     const { refreshToken } = request.body
 
-    // check required fields
-    if (!revokeTokenService) {
-      reply.unprocessableEntity('refreshToken & token fields is required')
+    const decoded: any = decode(refreshToken)
+
+    // check if token was expired
+    const isTokenExpired = Number(decoded.exp) < Math.floor(Date.now() / 1000)
+    if (isTokenExpired) {
+      reply.unauthorized('refresh token was expired please re-login')
       return
     }
 
     // check refresh token is revoked / logged out
-    const isRevoked = await revokeTokenService.readOne({ token: refreshToken }) !== undefined
-    if (isRevoked) {
-      reply.unauthorized('refresh token was revoked')
+    const isLoggedOut = await revokeTokenService.readOne({ token: refreshToken }) !== undefined
+    if (isLoggedOut) {
+      reply.unauthorized('refresh token was revoked please re-login')
       return
     }
 
@@ -135,20 +126,14 @@ export default async function userController(fastify: FastifyInstance) {
   })
 
   // POST /api/v1/identity
-  fastify.post("/identity", async function (
-    request: FastifyRequest<{ Body: { username: string, email: string } }>,
+  fastify.post("/identity", { schema: identity }, async function (
+    request: FastifyRequest<{ Body: { identity: string } }>,
     reply: FastifyReply
   ) {
-    const { username, email } = request.body
-
-    // check required fields
-    if (!(username || email)) {
-      reply.unprocessableEntity('username or email fields is required')
-      return
-    }
+    const { identity } = request.body
 
     // check if identity was taken
-    const isTaken = await userService.readOne({ where: [{ username }, { email }] }) !== undefined
+    const isTaken = await userService.readOne({ where: [{ username: identity }, { email: identity }] }) !== undefined
     if (isTaken) {
       reply.forbidden('username or email was taken')
       return
@@ -156,7 +141,7 @@ export default async function userController(fastify: FastifyInstance) {
 
     reply.send({
       statusCode: 200,
-      message: 'username or email can be use'
+      message: 'username or email not registered yet'
     })
 
   })

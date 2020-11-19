@@ -6,6 +6,7 @@ app.listen(FASTIFY_PORT, (err) => {
   if (err) {
     console.log(err)
   } else {
+    app.oas()
     console.log(`🚀  Fastify server running on port ${FASTIFY_PORT}`);
   }
 });
