@@ -2,7 +2,7 @@ import { compare, hash } from "bcrypt";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import jwt, { decode } from 'jsonwebtoken';
 import { RevokeTokenService, UserService } from '../../service';
-import { identity, login, logout, refresh, register } from './authSchema';
+import { identity as identitySchema, login, logout, refresh, register } from './authSchema';
 
 export default async function userController(fastify: FastifyInstance) {
   const userService = new UserService()
@@ -21,6 +21,12 @@ export default async function userController(fastify: FastifyInstance) {
     reply: FastifyReply,
   ) {
     const { identity, password } = request.body
+
+    // check required fields
+    if (!(identity && password)) {
+      reply.badRequest('identity & password fields is required')
+      return
+    }
 
     let user: any = await userService.readOne({ where: [{ email: identity }, { username: identity }] })
 
@@ -53,6 +59,12 @@ export default async function userController(fastify: FastifyInstance) {
     const { username, email, firstName, lastName } = request.body
     let { password } = request.body
 
+    // check required fields
+    if (!(username && email && firstName && lastName && password)) {
+      reply.badRequest('username, email, firstName, lastName, password fields is required')
+      return
+    }
+
     // save data user to database
     password = await hash(password, 10)
     const user = await userService.create({ username, email, firstName, lastName, password });
@@ -69,6 +81,12 @@ export default async function userController(fastify: FastifyInstance) {
     reply: FastifyReply
   ) {
     const { refreshToken } = request.body
+
+    // check required fields
+    if (!(refreshToken)) {
+      reply.badRequest('refreshToken field is required')
+      return
+    }
 
     const decoded: any = decode(refreshToken)
 
@@ -100,6 +118,12 @@ export default async function userController(fastify: FastifyInstance) {
   ) {
     const { refreshToken } = request.body
 
+    // check required fields
+    if (!(refreshToken)) {
+      reply.badRequest('refreshToken field is required')
+      return
+    }
+
     const decoded: any = decode(refreshToken)
 
     // check if token was expired
@@ -126,11 +150,17 @@ export default async function userController(fastify: FastifyInstance) {
   })
 
   // POST /api/v1/identity
-  fastify.post("/identity", { schema: identity }, async function (
+  fastify.post("/identity", { schema: identitySchema }, async function (
     request: FastifyRequest<{ Body: { identity: string } }>,
     reply: FastifyReply
   ) {
     const { identity } = request.body
+
+    // check required fields
+    if (!(identity)) {
+      reply.badRequest('identity field is required')
+      return
+    }
 
     // check if identity was taken
     const isTaken = await userService.readOne({ where: [{ username: identity }, { email: identity }] }) !== undefined
