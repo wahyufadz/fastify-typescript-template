@@ -1,3 +1,4 @@
+import {schemaResponse} from '../basicScema'
 
 export const login = {
   description: 'get login credential',
@@ -10,20 +11,8 @@ export const login = {
       identity: 'email / username',
       password: 'password'
     },
-    required: ['identity', 'password'],
   },
-  response: {
-    200: {
-      description: 'Success',
-      properties: {
-        statusCode: { type: 'number' },
-        message: { type: 'string' },
-        value: {
-          additionalProperties: true
-        }
-      },
-    }
-  },
+  response:schemaResponse
 }
 
 export const register = {
@@ -39,20 +28,8 @@ export const register = {
       firstName: 'first name',
       lastName: 'last name',
     },
-    required: ['email', 'username', 'password', 'firstName', 'lastName'],
   },
-  response: {
-    200: {
-      description: 'Success',
-      properties: {
-        statusCode: { type: 'number' },
-        message: { type: 'string' },
-        value: {
-          additionalProperties: true
-        }
-      },
-    }
-  },
+  response:schemaResponse
 }
 
 export const refresh = {
@@ -64,20 +41,8 @@ export const refresh = {
     example: {
       refreshToken: 'refresh Token',
     },
-    required: ['refreshToken'],
   },
-  response: {
-    200: {
-      description: 'Success',
-      properties: {
-        statusCode: { type: 'number' },
-        message: { type: 'string' },
-        value: {
-          additionalProperties: true
-        }
-      },
-    }
-  },
+  response:schemaResponse
 }
 
 export const logout = {
@@ -89,20 +54,8 @@ export const logout = {
     example: {
       refreshToken: 'refresh Token',
     },
-    required: ['refreshToken'],
   },
-  response: {
-    200: {
-      description: 'Success',
-      properties: {
-        statusCode: { type: 'number' },
-        message: { type: 'string' },
-        value: {
-          additionalProperties: true
-        }
-      },
-    }
-  },
+  response:schemaResponse
 }
 
 export const identity = {
@@ -114,18 +67,6 @@ export const identity = {
     example: {
       identity: 'username /email',
     },
-    required: ['identity'],
   },
-  response: {
-    200: {
-      description: 'Success',
-      properties: {
-        statusCode: { type: 'number' },
-        message: { type: 'string' },
-        value: {
-          additionalProperties: true
-        }
-      },
-    }
-  },
+  response:schemaResponse
 }
