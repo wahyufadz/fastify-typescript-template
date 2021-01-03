@@ -1,42 +1,63 @@
 import dotenv from "dotenv";
+import ejs from "ejs";
 import fastify from "fastify";
 import fastifyCORS from "fastify-cors";
 import fastifyFormBody from "fastify-formbody";
 import fastifyOAS from "fastify-oas";
 import fastifySensible from "fastify-sensible";
 import fastifyTypeOrm from "fastify-typeorm-plugin";
+import path from "path";
+import fastifyPointOfView from "point-of-view";
+
 import ormConfig from "../ormconfig.json";
 import router from "./router";
-import fastifyPointOfView from "point-of-view";
-import ejs from "ejs";
-import path from "path";
 
 dotenv.config();
 
 const server = fastify({
   // Logger only for production
-  logger: !!(process.env.NODE_ENV === "development"),
+  logger: !!(process.env.NODE_ENV !== "development"),
 });
 
+/**
+ * Plugin: fastify-cors
+ * ? enables the use of CORS in a Fastify application.
+ */
 server.register(fastifyCORS, {});
 
-// Plugin: fastify-typeorm-plugin
+/**
+ * Plugin: fastify-typeorm-plugin
+ * ? plugin for TypeORM for sharing the same TypeORM connection
+ * ? in every part of your server.
+ */
 server.register(fastifyTypeOrm, {
   ...ormConfig,
 
-  // fix directory structure bug in production mode
+  // directory structure for TypeORM
   entities: [__dirname + "/entity/index.{js,ts}"],
   migrations: [__dirname + "/migration/**/*.{js,ts}"],
   subscribers: [__dirname + "/subscriber/**/*.{js,ts}"],
 });
 
-// Plugin: fastify-formbody
+/**
+ * Plugin: fastify-formbody
+ * ? plugin for Fastify that adds a content type parser
+ * ? for the content type application/x-www-form-urlencoded.
+ */
+
 server.register(fastifyFormBody);
 
-// Plugin: fastify-sensible
+/**
+ * Plugin: fastify-sensible
+ * ? standard fastify function to handle many thing
+ */
 server.register(fastifySensible);
 
-// Plugin: fastify-oas
+/**
+ * Plugin: fastify-oas
+ * ? documentation generator for Fastify.
+ * ? It uses the schemas you declare in your routes to generate an OpenAPI (swagger) compliant doc.
+ */
 server.register(fastifyOAS, {
   routePrefix: "/documentation",
   swagger: {
@@ -85,6 +106,11 @@ server.register(fastifyOAS, {
   exposeRoute: true,
 });
 
+/**
+ * Plugin: point-of-view
+ * ? decorates the reply interface with the view method
+ * ? for manage view engines that can be used to render templates responses.
+ */
 server.register(fastifyPointOfView, {
   engine: {
     ejs,
