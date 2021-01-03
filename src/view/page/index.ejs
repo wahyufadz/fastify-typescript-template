@@ -1,18 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fastify + Typescript App</title>
-    <style>
-      body {
-        font-family: Georgia, "Times New Roman", Times, serif;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Welcome to Fastify + Typescript App 🔥</h1>
-    <h2>API Documentation</h2>
+<% include('../template/header.ejs') %> 
+<style>
+    body {
+      font-family: Georgia, "Times New Roman", Times, serif;
+    }
+  </style>
+<body>
+    <h1>Welcome to Fastify + Typescript Template 🔥</h1>
+    <a href="/documentation">
+      <h2>Swagger API Documentation</h2>
+    </a>
     <div id="app"></div>
 
     <script>
@@ -38,4 +34,3 @@
       initApp();
     </script>
   </body>
-</html>
