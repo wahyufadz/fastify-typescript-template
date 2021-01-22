@@ -9,7 +9,7 @@ import fastifyTypeOrm from "fastify-typeorm-plugin";
 import path from "path";
 import fastifyPointOfView from "point-of-view";
 
-import ormConfig from "../ormconfig.json";
+import { ormconfig } from "./ormconfig";
 import router from "./router";
 
 dotenv.config();
@@ -30,14 +30,7 @@ server.register(fastifyCORS, {});
  * ? plugin for TypeORM for sharing the same TypeORM connection
  * ? in every part of your server.
  */
-server.register(fastifyTypeOrm, {
-  ...ormConfig,
-
-  // directory structure for TypeORM
-  entities: [__dirname + "/entity/index.{js,ts}"],
-  migrations: [__dirname + "/migration/**/*.{js,ts}"],
-  subscribers: [__dirname + "/subscriber/**/*.{js,ts}"],
-});
+server.register(fastifyTypeOrm, { ...ormconfig });
 
 /**
  * Plugin: fastify-formbody
