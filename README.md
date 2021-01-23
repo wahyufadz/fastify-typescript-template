@@ -12,10 +12,10 @@ $ yarn setup
 
 ## What Inside ?
 
-> Fastify
-> Typescript
-> Type Orm
-> php + mariadb (mysql) docker
+* Fastify
+* Typescript
+* Type Orm
+* Docker Compose file (NGINX + PHP + mariaDB )
 
 ### Development
 
