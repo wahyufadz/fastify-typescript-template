@@ -100,6 +100,12 @@ export default async function userController(fastify: FastifyInstance) {
 
       const decoded: any = decode(refreshToken);
 
+      //  check if token is not valid
+      if (!decoded) {
+        reply.badRequest("refreshToken is not valid");
+        return;
+      }
+
       // check if token was expired
       const isTokenExpired =
         Number(decoded.exp) < Math.floor(Date.now() / 1000);
@@ -133,6 +139,12 @@ export default async function userController(fastify: FastifyInstance) {
       const { refreshToken } = request.body;
 
       const decoded: any = decode(refreshToken);
+
+      //  check if token is not valid
+      if (!decoded) {
+        reply.badRequest("refreshToken is not valid");
+        return;
+      }
 
       // check if token was expired
       const isTokenExpired =
