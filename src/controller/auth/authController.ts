@@ -6,7 +6,8 @@ import {
   HookHandlerDoneFunction,
 } from "fastify";
 import jwt, { decode } from "jsonwebtoken";
-import { RevokeTokenService, UserService } from "../../service";
+import { RevokeToken, User } from "../../entity";
+import { getManager } from "typeorm";
 import {
   identity as identitySchema,
   login,
@@ -16,9 +17,6 @@ import {
 } from "./authSchema";
 
 export default async function userController(fastify: FastifyInstance) {
-  const userService = new UserService();
-  const revokeTokenService = new RevokeTokenService();
-
   // POST /api/v1/auth/login
   fastify.post<{ Body: { identity: string; password: string } }>("/login", {
     schema: login,
@@ -26,7 +24,7 @@ export default async function userController(fastify: FastifyInstance) {
     handler: async function (request, reply) {
       const { identity, password } = request.body;
 
-      let user: any = await userService.readOne({
+      let user: any = await getManager().findOne(User, {
         where: [{ email: identity }, { username: identity }],
       });
 
@@ -76,17 +74,18 @@ export default async function userController(fastify: FastifyInstance) {
 
       // save data user to database
       password = await hash(password, 10);
-      const user = await userService.create({
-        username,
-        email,
-        firstName,
-        lastName,
-        password,
-      });
+      const newUser = new User();
+      newUser.username = username;
+      newUser.email = email;
+      newUser.firstName = firstName;
+      newUser.lastName = lastName;
+      newUser.password = password;
+      await getManager().save(newUser);
+
       reply.send({
         statusCode: 201,
         message: "user created",
-        value: createToken(user),
+        value: createToken(newUser),
       });
     },
   });
@@ -116,7 +115,7 @@ export default async function userController(fastify: FastifyInstance) {
 
       // check refresh token is revoked / logged out
       const isLoggedOut =
-        (await revokeTokenService.readOne({ token: refreshToken })) !==
+        (await getManager().findOne(RevokeToken, { token: refreshToken })) !==
         undefined;
       if (isLoggedOut) {
         reply.unauthorized("refresh token was revoked please re-login");
@@ -156,7 +155,7 @@ export default async function userController(fastify: FastifyInstance) {
 
       // check refresh token is revoked / logged out
       const isLoggedOut =
-        (await revokeTokenService.readOne({ token: refreshToken })) !==
+        (await getManager().findOne(RevokeToken, { token: refreshToken })) !==
         undefined;
       if (isLoggedOut) {
         reply.unauthorized("refresh token was revoked please re-login");
@@ -164,7 +163,9 @@ export default async function userController(fastify: FastifyInstance) {
       }
 
       // save refresh token as revoked
-      await revokeTokenService.create({ token: refreshToken });
+      const revokedToken = new RevokeToken();
+      revokedToken.token = refreshToken;
+      await getManager().save(revokedToken);
       reply.send({
         statusCode: 200,
         message: "user was logged out",
@@ -181,7 +182,7 @@ export default async function userController(fastify: FastifyInstance) {
 
       // check if identity was taken
       const isTaken =
-        (await userService.readOne({
+        (await getManager().findOne(User, {
           where: [{ username: identity }, { email: identity }],
         })) !== undefined;
       if (isTaken) {
