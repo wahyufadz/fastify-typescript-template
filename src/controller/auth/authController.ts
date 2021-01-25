@@ -1,10 +1,5 @@
 import { compare, hash } from "bcrypt";
-import {
-  FastifyInstance,
-  FastifyReply,
-  FastifyRequest,
-  HookHandlerDoneFunction,
-} from "fastify";
+import { FastifyInstance } from "fastify";
 import jwt, { decode } from "jsonwebtoken";
 import { RevokeToken, User } from "../../entity";
 import { getManager } from "typeorm";
@@ -16,11 +11,13 @@ import {
   register,
 } from "./authSchema";
 
+import { checkRequiredParams } from "../utils";
+
 export default async function userController(fastify: FastifyInstance) {
   // POST /api/v1/auth/login
   fastify.post<{ Body: { identity: string; password: string } }>("/login", {
     schema: login,
-    preHandler: checkRequiredParams(["identity", "password"]),
+    preHandler: checkRequiredParams("identity", "password"),
     handler: async function (request, reply) {
       const { identity, password } = request.body;
 
@@ -61,13 +58,13 @@ export default async function userController(fastify: FastifyInstance) {
     };
   }>("/register", {
     schema: register,
-    preHandler: checkRequiredParams([
+    preHandler: checkRequiredParams(
       "username",
       "email",
       "firstName",
       "lastName",
-      "password",
-    ]),
+      "password"
+    ),
     handler: async function (request, reply) {
       const { username, email, firstName, lastName } = request.body;
       let { password } = request.body;
@@ -93,7 +90,7 @@ export default async function userController(fastify: FastifyInstance) {
   // POST /api/v1/auth/refresh
   fastify.post<{ Body: { refreshToken: string } }>("/refresh", {
     schema: refresh,
-    preHandler: checkRequiredParams(["refreshToken"]),
+    preHandler: checkRequiredParams("refreshToken"),
     handler: async function (request, reply) {
       const { refreshToken } = request.body;
 
@@ -133,7 +130,7 @@ export default async function userController(fastify: FastifyInstance) {
   // POST /api/v1/auth/logout
   fastify.post<{ Body: { refreshToken: string } }>("/logout", {
     schema: logout,
-    preHandler: checkRequiredParams(["refreshToken"]),
+    preHandler: checkRequiredParams("refreshToken"),
     handler: async function (request, reply) {
       const { refreshToken } = request.body;
 
@@ -176,7 +173,7 @@ export default async function userController(fastify: FastifyInstance) {
   // POST /api/v1/identity
   fastify.post<{ Body: { identity: string } }>("/identity", {
     schema: identitySchema,
-    preHandler: checkRequiredParams(["identity"]),
+    preHandler: checkRequiredParams("identity"),
     handler: async function (request, reply) {
       const { identity } = request.body;
 
@@ -211,20 +208,4 @@ const createToken = (user: any) => {
     { expiresIn: "10d" }
   );
   return { token, refreshToken, user };
-};
-
-const checkRequiredParams = <T>(params: string[]) => (
-  request: FastifyRequest<T>,
-  reply: FastifyReply,
-  next: HookHandlerDoneFunction
-) => {
-  const required: string[] = [];
-  params.forEach((param) => {
-    if (!(param in request.body)) required.push(param);
-  });
-  if (required.length) {
-    reply.badRequest(required.join(", ") + " is required");
-    return;
-  }
-  next();
 };

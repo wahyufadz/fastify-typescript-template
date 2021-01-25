@@ -1,28 +1,23 @@
-import { BeforeInsert, Column, Entity } from "typeorm";
+import { Column, Entity } from "typeorm";
 import { BasicEntity } from "../basic";
 
 @Entity()
 export class User extends BasicEntity {
-  @Column()
-  firstName: string = "";
-
-  @Column()
-  lastName: string = "";
-
   @Column({ unique: true })
   username: string;
 
   @Column({ unique: true })
   email: string;
 
-  @Column()
+  @Column({ nullable: true })
   password: string;
 
-  @Column()
-  isActive: boolean;
+  @Column({ default: "" })
+  firstName: string;
 
-  @BeforeInsert()
-  insert() {
-    this.isActive = true;
-  }
+  @Column({ default: "" })
+  lastName: string;
+
+  @Column({ default: true })
+  isActive: boolean;
 }
